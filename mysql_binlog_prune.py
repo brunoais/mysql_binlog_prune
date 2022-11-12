@@ -58,6 +58,7 @@ def order_remove_binlog(binlog):
             stderr=sys.stderr,
             input=operation.encode("utf-8")
         )
+        printe("Done")
     else:
         printe(answer, "is not 'yes'. Not executting.")
 
@@ -71,7 +72,7 @@ for i, binlog in enumerate(map(Path, binlog_lines)):
 
 
 for binlog in binlogs:
-    if binlog.num > program_args.number_retain:
+    if binlog.num == program_args.number_retain:
         printe("Deleting binlog", binlog.path, "due to max of ", binlog.num, "binlogs")
         order_remove_binlog(binlog.path)
         exit(0)
