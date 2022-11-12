@@ -84,7 +84,7 @@ for binlog in binlogs:
 
 
 
-print(binlogs)
+printe("Nothing to do")
 
 
 
