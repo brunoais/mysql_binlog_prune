@@ -9,7 +9,7 @@ from collections import namedtuple
 from functools import partial
 from pathlib import Path
 
-HUGE_NUMBER = 99999999999999999999999999
+HUGE_NUMBER = 99999999999999999999999999999999999999999999
 printe = partial(print, file=sys.stderr)
 
 BinlogData = namedtuple('BinlogData', ['num', 'size_sum', 'size', 'path'])
@@ -63,21 +63,22 @@ def order_remove_binlog(binlog):
         printe(answer, "is not 'yes'. Not executting.")
 
 accu_size_sum = 0
+binlog_lines.reverse()
 binlogs = []
 for i, binlog in enumerate(map(Path, binlog_lines)):
-    num = len(binlog_lines) - i
     bl_size = binlog.stat().st_size
     accu_size_sum += bl_size
-    binlogs.append(BinlogData(num, accu_size_sum, bl_size, binlog))
+    binlogs.append(BinlogData(i, accu_size_sum, bl_size, binlog))
 
+binlogs.reverse()
 
-for binlog in binlogs:
-    if binlog.num == program_args.number_retain:
+for prevbinlog, binlog in zip(binlogs, binlogs[1:]):
+    if binlog.num + 1 == program_args.number_retain:
         printe("Deleting binlog", binlog.path, "due to max of ", binlog.num, "binlogs")
         order_remove_binlog(binlog.path)
         exit(0)
 
-    if binlog.size_sum > program_args.size_retain:
+    if binlog.size_sum <= program_args.size_retain <= prevbinlog.size_sum:
         printe("Deleting binlog", binlog.path, "due to max total size of", binlog.size_sum, "which binlogs can consume")
         order_remove_binlog(binlog.path)
         exit(0)
